@@ -5,6 +5,7 @@ module.exports = {
     semi: ['error', 'never'],
     'comma-dangle': ['error', 'never'],
     'object-curly-spacing': ['error', 'always'],
-    'no-extra-boolean-cast': 'off'
+    'no-extra-boolean-cast': 'off',
+    'prefer-const': 'error'
   }
 }
