@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import {
   Container,
@@ -14,8 +14,11 @@ import SignInput from '../../components/SignInput'
 import BarberLogo from './../../assets/barber.svg'
 import EmailIcon from './../../assets/email.svg'
 import LockIcon from './../../assets/lock.svg'
+import AsyncStorage from '@react-native-community/async-storage'
+import { UserContext } from '../../contexts/UserContext'
 
 export default () => {
+  const { dispatch: userDispatch } = useContext(UserContext)
   const navigation = useNavigation()
   const [email, setEmail] = useState('suporte@b7web.com.br')
   const [password, setPassword] = useState('1234')
@@ -31,7 +34,15 @@ export default () => {
       const json = await Api.signIn(email, password)
 
       if (json.token) {
-        console.log(json)
+        await AsyncStorage.setItem('token', json.token)
+        userDispatch({
+          type: 'setAvatar',
+          payload: { avatar: json.data.avatar }
+        })
+
+        navigation.reset({
+          routes: [{ name: 'MainTab' }]
+        })
       } else {
         alert('wrong data')
       }

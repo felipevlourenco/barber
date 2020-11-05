@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import {
   Container,
@@ -14,8 +14,12 @@ import BarberLogo from './../../assets/barber.svg'
 import PersonIcon from './../../assets/person.svg'
 import EmailIcon from './../../assets/email.svg'
 import LockIcon from './../../assets/lock.svg'
+import Api from '../../Api'
+import AsyncStorage from '@react-native-community/async-storage'
+import { UserContext } from '../../contexts/UserContext'
 
 export default () => {
+  const { dispatch: userDispatch } = useContext(UserContext)
   const navigation = useNavigation()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -27,7 +31,27 @@ export default () => {
     })
   }
 
-  const handleSignup = () => {}
+  const handleSignup = async () => {
+    if (!!name && !!email && !!password) {
+      const json = await Api.signUp(name, email, password)
+
+      if (json.token) {
+        await AsyncStorage.setItem('token', json.token)
+        userDispatch({
+          type: 'setAvatar',
+          payload: { avatar: json.data.avatar }
+        })
+
+        navigation.reset({
+          routes: [{ name: 'MainTab' }]
+        })
+      } else {
+        console.log(json.error)
+      }
+    } else {
+      alert('fill all fields')
+    }
+  }
 
   return (
     <Container>
